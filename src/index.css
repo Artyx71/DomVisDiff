@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-zinc-100 antialiased font-sans;
+  }
+}
+
+/* React Flow dark theme overrides */
+.react-flow {
+  --xy-edge-stroke: #3f3f46;
+  --xy-connectionline-stroke: #6c6cff;
+  --xy-node-color: #f4f4f5;
+  --xy-node-border-radius: 8px;
+  --xy-background-color: transparent;
+  --xy-background-pattern-color: #27272a;
+  --xy-minimap-background-color-dark: #18181b;
+  --xy-minimap-mask-color-dark: rgba(0, 0, 0, 0.6);
+  --xy-node-boxshadow-hover-dark: 0 0 0 1px #6c6cff;
+}
