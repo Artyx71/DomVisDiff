@@ -1,4 +1,4 @@
-import { DomTreeNode, DiffStatus } from './parseHtmlToTree';
+import type { DomTreeNode, DiffStatus } from './parseHtmlToTree';
 
 export function diffTrees(before: DomTreeNode | null, after: DomTreeNode | null): { before: DomTreeNode | null, after: DomTreeNode | null } {
     if (!before && !after) return { before: null, after: null };

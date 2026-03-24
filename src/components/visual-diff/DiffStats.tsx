@@ -1,5 +1,4 @@
-import React from 'react';
-import { DiffResult } from '../../lib/imagePixelDiff';
+import type { DiffResult } from '../../lib/imagePixelDiff';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';

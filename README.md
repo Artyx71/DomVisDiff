@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# DOMDiff
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DOMDiff is a developer tool designed as a Chrome Extension to help compare two versions of a webpage both visually and structurally. 
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Visual Diff:**
+- Upload "Before" and "After" images.
+- Interactive slider, overlay (with pixel differences highlighted in red), and side-by-side viewing modes.
+- Diff statistics badge with pixel logic powered by `pixelmatch` via canvas processing.
 
-## React Compiler
+**DOM Diff:**
+- Paste raw HTML strings or enter live webpage URLs (powered by direct fetching).
+- View a fully parsed representation of changes side-by-side using an interactive node graph (`@xyflow/react`).
+- See distinct DOM manipulation states per node: Added (Green), Removed (Red), Modified (Yellow), or Unchanged (Gray).
+- Click on any node to view a detailed slide-out properties sidebar to inspect tag, status, attributes, inner text, and structural path.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Local Development
 
-## Expanding the ESLint configuration
+The project is built on **React 18**, **TypeScript**, **Tailwind CSS v3**, and **Vite**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Run the development server
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build the project for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Installing the Chrome Extension
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Since DOMDiff functions securely via a browser extension (Manifest V3), here's how to load it:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. Run `npm run build` in the repository folder. This will output all extension files into the `dist` folder.
+2. Open Google Chrome and go to `chrome://extensions/`.
+3. Enable **"Developer mode"** in the top right.
+4. Click **"Load unpacked"** and select the `/dist` folder inside this repository.
+5. DOMDiff is now installed and accessible by clicking the extension icon. Enjoy comparing your DOM!
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

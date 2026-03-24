@@ -1,6 +1,5 @@
-import React from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { DomTreeNode } from '../../lib/parseHtmlToTree';
+import type { DomTreeNode } from '../../lib/parseHtmlToTree';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

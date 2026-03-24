@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layers, FileCode2 } from 'lucide-react';
 import VisualDiffTab from './components/visual-diff/VisualDiffTab';
 import DomDiffTab from './components/dom-diff/DomDiffTab';
@@ -17,8 +17,8 @@ function App() {
           <button
             onClick={() => setActiveTab('visual')}
             className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${activeTab === 'visual'
-                ? 'bg-accent text-white shadow-md'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+              ? 'bg-accent text-white shadow-md'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
               }`}
           >
             <Layers size={18} />
@@ -27,8 +27,8 @@ function App() {
           <button
             onClick={() => setActiveTab('dom')}
             className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${activeTab === 'dom'
-                ? 'bg-accent text-white shadow-md'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+              ? 'bg-accent text-white shadow-md'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
               }`}
           >
             <FileCode2 size={18} />

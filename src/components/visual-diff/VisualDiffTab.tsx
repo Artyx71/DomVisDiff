@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import ImageUploader from './ImageUploader';
 import DiffViewer from './DiffViewer';
 import DiffStats from './DiffStats';
-import { computeImageDiff, DiffResult } from '../../lib/imagePixelDiff';
+import { computeImageDiff } from '../../lib/imagePixelDiff';
+import type { DiffResult } from '../../lib/imagePixelDiff';
 import { Loader2, SlidersHorizontal, Layers, SplitSquareHorizontal } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';

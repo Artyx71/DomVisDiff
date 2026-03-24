@@ -1,5 +1,4 @@
-import React from 'react';
-import { DomTreeNode } from '../../lib/parseHtmlToTree';
+import type { DomTreeNode } from '../../lib/parseHtmlToTree';
 import { X } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,9 +22,9 @@ export default function NodeSidebar({ node, onClose }: SidebarProps) {
                 <div>
                     <h4 className="text-[10px] tracking-wider uppercase text-zinc-500 font-bold mb-3">Status</h4>
                     <span className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider ${node.status === 'added' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' :
-                            node.status === 'removed' ? 'bg-red-500/20 text-red-500 border border-red-500/20' :
-                                node.status === 'modified' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/20' :
-                                    'bg-zinc-800 text-zinc-300 border border-zinc-700'
+                        node.status === 'removed' ? 'bg-red-500/20 text-red-500 border border-red-500/20' :
+                            node.status === 'modified' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/20' :
+                                'bg-zinc-800 text-zinc-300 border border-zinc-700'
                         }`}>
                         {node.status || 'unchanged'}
                     </span>

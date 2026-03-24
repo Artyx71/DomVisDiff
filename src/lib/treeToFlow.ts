@@ -1,5 +1,5 @@
-import { Node, Edge } from '@xyflow/react';
-import { DomTreeNode } from './parseHtmlToTree';
+import type { Node, Edge } from '@xyflow/react';
+import type { DomTreeNode } from './parseHtmlToTree';
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 80;
