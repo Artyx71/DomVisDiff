@@ -29,8 +29,8 @@ export default function DomDiffTab() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const fetchHtml = async (url: string) => {
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const res = await fetch(proxyUrl);
+        // Since it's a Chrome Extension with <all_urls> permission, fetch works directly!
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`);
         return await res.text();
     };
