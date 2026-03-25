@@ -98,34 +98,46 @@ export default function VisualDiffTab() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-zinc-900 border border-zinc-800 p-4 rounded-xl shadow-md">
                         <DiffStats result={diffResult} />
 
-                        <div className="flex bg-zinc-950 rounded-lg p-1 border border-zinc-800">
-                            <button
-                                onClick={() => setViewMode('slider')}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                                    viewMode === 'slider' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-                                )}
-                            >
-                                <SlidersHorizontal size={16} /> Slider
-                            </button>
-                            <button
-                                onClick={() => setViewMode('overlay')}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                                    viewMode === 'overlay' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-                                )}
-                            >
-                                <Layers size={16} /> Overlay
-                            </button>
-                            <button
-                                onClick={() => setViewMode('side-by-side')}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                                    viewMode === 'side-by-side' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-                                )}
-                            >
-                                <SplitSquareHorizontal size={16} /> Side-by-side
-                            </button>
+                        <div className="flex items-center gap-3">
+                            <div className="flex bg-zinc-950 rounded-lg p-1 border border-zinc-800">
+                                <button
+                                    onClick={() => setViewMode('slider')}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                                        viewMode === 'slider' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                                    )}
+                                >
+                                    <SlidersHorizontal size={16} /> Slider
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('overlay')}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                                        viewMode === 'overlay' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                                    )}
+                                >
+                                    <Layers size={16} /> Overlay
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('side-by-side')}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                                        viewMode === 'side-by-side' ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                                    )}
+                                >
+                                    <SplitSquareHorizontal size={16} /> Side-by-side
+                                </button>
+                            </div>
+
+                            {diffResult?.diffDataUrl && (
+                                <a
+                                    href={diffResult.diffDataUrl}
+                                    download="diff-result.png"
+                                    className="bg-accent/10 hover:bg-accent text-accent hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all border border-accent/20"
+                                >
+                                    Download Diff
+                                </a>
+                            )}
                         </div>
                     </div>
 
