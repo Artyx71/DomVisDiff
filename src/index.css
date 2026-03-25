@@ -10,6 +10,20 @@
   }
 }
 
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+  }
+  
+  .glass-dark {
+    @apply bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 shadow-2xl;
+  }
+
+  .accent-glow {
+    @apply shadow-[0_0_20px_rgba(108,108,255,0.2)];
+  }
+}
+
 /* React Flow dark theme overrides */
 .react-flow {
   --xy-edge-stroke: #3f3f46;
@@ -21,4 +35,11 @@
   --xy-minimap-background-color-dark: #18181b;
   --xy-minimap-mask-color-dark: rgba(0, 0, 0, 0.6);
   --xy-node-boxshadow-hover-dark: 0 0 0 1px #6c6cff;
+}
+
+.react-flow__handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: #6c6cff !important;
+  border: 2px solid #0a0a0f !important;
 }
