@@ -7,7 +7,7 @@ export interface DiffResult {
     diffPercentage: number;
 }
 
-export async function computeImageDiff(img1Url: string, img2Url: string): Promise<DiffResult> {
+export async function computeImageDiff(img1Url: string, img2Url: string, threshold = 0.1): Promise<DiffResult> {
     const img1 = await loadImage(img1Url);
     const img2 = await loadImage(img2Url);
 
@@ -42,7 +42,7 @@ export async function computeImageDiff(img1Url: string, img2Url: string): Promis
         diffData.data,
         width,
         height,
-        { threshold: 0.1, diffColor: [231, 76, 60] } // diffRemoved color #e74c3c
+        { threshold, diffColor: [231, 76, 60] }
     );
 
     diffCtx.putImageData(diffData, 0, 0);

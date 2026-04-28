@@ -8,6 +8,7 @@ import { diffTrees } from '../../lib/diffTrees';
 import { treeToFlow } from '../../lib/treeToFlow';
 import CustomNode from './CustomNode';
 import NodeSidebar from './NodeSidebar';
+import DomDiffStats from './DomDiffStats';
 import { FileCode2, GitCompare, Code2, AlertCircle } from 'lucide-react';
 
 const nodeTypes = {
@@ -225,11 +226,9 @@ export default function DomDiffTab() {
                 </div>
             ) : (
                 <div className="relative w-full h-full border border-white/5 rounded-3xl overflow-hidden glass-dark flex flex-col shadow-[0_32px_64px_-12px_rgba(0,0,0,0.7)] animate-in zoom-in-95 duration-500">
-                    <div className="absolute top-6 left-6 z-10 flex gap-6 bg-zinc-950/80 backdrop-blur-2xl border border-white/10 p-4 px-6 rounded-2xl items-center text-sm font-bold shadow-2xl">
-                        <div className="flex items-center gap-2.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(46,204,113,0.8)]"></span> Added</div>
-                        <div className="flex items-center gap-2.5"><span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_12px_rgba(231,76,60,0.8)]"></span> Removed</div>
-                        <div className="flex items-center gap-2.5"><span className="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_12px_rgba(243,156,18,0.8)]"></span> Modified</div>
-                        <div className="flex items-center gap-2.5"><span className="w-3 h-3 rounded-full bg-zinc-600"></span> Unchanged</div>
+                    <div className="absolute top-6 left-6 z-10 flex gap-3 items-center flex-wrap">
+                    <div className="flex gap-6 bg-zinc-950/80 backdrop-blur-2xl border border-white/10 p-4 px-6 rounded-2xl items-center text-sm font-bold shadow-2xl">
+                        <DomDiffStats before={rawDiffedBefore} after={rawDiffedAfter} />
 
                         <div className="w-px h-6 bg-zinc-800 mx-2"></div>
 
@@ -255,6 +254,7 @@ export default function DomDiffTab() {
                         >
                             Edit Inputs
                         </button>
+                    </div>
                     </div>
 
                     <ReactFlow

@@ -16,6 +16,7 @@ export default function VisualDiffTab() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('slider');
     const [error, setError] = useState<string | null>(null);
+    const [threshold, setThreshold] = useState(0.1);
 
     const handleCompare = useCallback(async () => {
         if (!beforeImg || !afterImg) return;
@@ -23,14 +24,14 @@ export default function VisualDiffTab() {
         setIsProcessing(true);
         setError(null);
         try {
-            const result = await computeImageDiff(beforeImg, afterImg);
+            const result = await computeImageDiff(beforeImg, afterImg, threshold);
             setDiffResult(result);
         } catch (err: any) {
             setError(err.message || 'Failed to compute diff. Make sure images are valid.');
         } finally {
             setIsProcessing(false);
         }
-    }, [beforeImg, afterImg]);
+    }, [beforeImg, afterImg, threshold]);
 
     return (
         <div className="flex flex-col gap-6 w-full">
@@ -80,9 +81,24 @@ export default function VisualDiffTab() {
                 </div>
             )}
 
-            {/* Compare Action */}
+            {/* Sensitivity slider — shown when images loaded but no result yet */}
             {beforeImg && afterImg && !diffResult && (
-                <div className="flex justify-center mt-4">
+                <div className="flex flex-col items-center gap-6 mt-4">
+                    <div className="flex items-center gap-4 bg-zinc-900/60 border border-zinc-800 px-6 py-3 rounded-xl w-full max-w-md">
+                        <label className="text-zinc-400 text-sm font-medium whitespace-nowrap">Sensitivity</label>
+                        <input
+                            type="range"
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={threshold}
+                            onChange={e => { setThreshold(parseFloat(e.target.value)); }}
+                            className="flex-1 accent-accent"
+                        />
+                        <span className="text-zinc-300 text-sm font-mono w-10 text-right">{threshold.toFixed(2)}</span>
+                    </div>
+                    <p className="text-xs text-zinc-600 -mt-3">Lower = more sensitive to subtle changes</p>
+
                     <button
                         onClick={handleCompare}
                         disabled={isProcessing}
@@ -131,6 +147,13 @@ export default function VisualDiffTab() {
                                     <SplitSquareHorizontal size={16} /> Side-by-side
                                 </button>
                             </div>
+
+                            <button
+                                onClick={() => { setDiffResult(null); }}
+                                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                            >
+                                Re-compare
+                            </button>
 
                             {diffResult?.diffDataUrl && (
                                 <a
