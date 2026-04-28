@@ -4,13 +4,8 @@ import DiffViewer from './DiffViewer';
 import DiffStats from './DiffStats';
 import { computeImageDiff } from '../../lib/imagePixelDiff';
 import type { DiffResult } from '../../lib/imagePixelDiff';
-import { Loader2, SlidersHorizontal, Layers, SplitSquareHorizontal } from 'lucide-react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-    return twMerge(clsx(inputs));
-}
+import { Loader2, SlidersHorizontal, Layers, SplitSquareHorizontal, AlertCircle } from 'lucide-react';
+import { cn } from '../../lib/cn';
 
 type ViewMode = 'slider' | 'overlay' | 'side-by-side';
 
@@ -20,17 +15,18 @@ export default function VisualDiffTab() {
     const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('slider');
+    const [error, setError] = useState<string | null>(null);
 
     const handleCompare = useCallback(async () => {
         if (!beforeImg || !afterImg) return;
 
         setIsProcessing(true);
+        setError(null);
         try {
             const result = await computeImageDiff(beforeImg, afterImg);
             setDiffResult(result);
-        } catch (error) {
-            console.error("Failed to compute diff", error);
-            alert("Error computing diff. Make sure images are valid.");
+        } catch (err: any) {
+            setError(err.message || 'Failed to compute diff. Make sure images are valid.');
         } finally {
             setIsProcessing(false);
         }
@@ -76,6 +72,13 @@ export default function VisualDiffTab() {
                     )}
                 </div>
             </div>
+
+            {error && (
+                <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+                    <AlertCircle size={18} className="shrink-0" />
+                    {error}
+                </div>
+            )}
 
             {/* Compare Action */}
             {beforeImg && afterImg && !diffResult && (

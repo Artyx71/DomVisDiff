@@ -1,14 +1,9 @@
 import type { DiffResult } from '../../lib/imagePixelDiff';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../../lib/cn';
 
 interface DiffStatsProps {
     result: DiffResult;
-}
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-    return twMerge(clsx(inputs));
 }
 
 export default function DiffStats({ result }: DiffStatsProps) {

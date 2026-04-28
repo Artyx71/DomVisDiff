@@ -1,11 +1,6 @@
 import { Handle, Position } from '@xyflow/react';
 import type { DomTreeNode } from '../../lib/parseHtmlToTree';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-    return twMerge(clsx(inputs));
-}
+import { cn } from '../../lib/cn';
 
 export default function CustomNode({ data }: { data: { node: DomTreeNode } }) {
     const { node } = data;

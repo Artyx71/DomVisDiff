@@ -1,16 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../../lib/cn';
 
 interface DiffViewerProps {
     beforeImg: string;
     afterImg: string;
     diffImg?: string;
     mode: 'slider' | 'overlay' | 'side-by-side';
-}
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-    return twMerge(clsx(inputs));
 }
 
 export default function DiffViewer({ beforeImg, afterImg, diffImg, mode }: DiffViewerProps) {

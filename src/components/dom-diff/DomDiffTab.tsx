@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, BackgroundVariant } from '@xyflow/react';
 import type { Node, Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -8,7 +8,7 @@ import { diffTrees } from '../../lib/diffTrees';
 import { treeToFlow } from '../../lib/treeToFlow';
 import CustomNode from './CustomNode';
 import NodeSidebar from './NodeSidebar';
-import { FileCode2, GitCompare, Code2 } from 'lucide-react';
+import { FileCode2, GitCompare, Code2, AlertCircle } from 'lucide-react';
 
 const nodeTypes = {
     domNode: CustomNode,
@@ -23,73 +23,103 @@ export default function DomDiffTab() {
 
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-    const [selectedNode, setSelectedNode] = useState<DomTreeNode | null>(null);
+    const [selectedNode, setSelectedNode] = useState<{ before: DomTreeNode | null; after: DomTreeNode | null } | null>(null);
 
     const [hasCompared, setHasCompared] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [showOnlyChanges, setShowOnlyChanges] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchHtml = async (url: string) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`);
-        return await res.text();
-    };
+    const [rawDiffedBefore, setRawDiffedBefore] = useState<DomTreeNode | null>(null);
+    const [rawDiffedAfter, setRawDiffedAfter] = useState<DomTreeNode | null>(null);
+
+    // Build a path → node map for looking up counterpart nodes
+    const buildPathMap = useCallback((root: DomTreeNode | null): Map<string, DomTreeNode> => {
+        const map = new Map<string, DomTreeNode>();
+        function walk(n: DomTreeNode) {
+            map.set(n.path, n);
+            n.children.forEach(walk);
+        }
+        if (root) walk(root);
+        return map;
+    }, []);
 
     const filterTree = useCallback((node: DomTreeNode | null): DomTreeNode | null => {
         if (!node) return null;
         if (node.status !== 'unchanged') return node;
-
         const filteredChildren = (node.children || [])
             .map(child => filterTree(child))
             .filter((child): child is DomTreeNode => child !== null);
-
-        if (filteredChildren.length > 0) {
-            return { ...node, children: filteredChildren };
-        }
+        if (filteredChildren.length > 0) return { ...node, children: filteredChildren };
         return null;
     }, []);
 
+    // Reactively rebuild flow graph when raw trees or filter toggle changes
+    useEffect(() => {
+        if (!rawDiffedBefore && !rawDiffedAfter) return;
+
+        const displayBefore = showOnlyChanges ? filterTree(rawDiffedBefore) : rawDiffedBefore;
+        const displayAfter = showOnlyChanges ? filterTree(rawDiffedAfter) : rawDiffedAfter;
+
+        const { nodes: bNodes, edges: bEdges } = treeToFlow(displayBefore, 0, 0);
+        let maxX = 0;
+        bNodes.forEach(n => { if (n.position.x > maxX) maxX = n.position.x; });
+        const rightXOffset = Math.max(maxX + 600, 800);
+        const { nodes: aNodes, edges: aEdges } = treeToFlow(displayAfter, rightXOffset, 0);
+
+        setNodes([...bNodes, ...aNodes]);
+        setEdges([...bEdges, ...aEdges]);
+    }, [rawDiffedBefore, rawDiffedAfter, showOnlyChanges, filterTree, setNodes, setEdges]);
+
     const handleCompare = useCallback(async () => {
         setIsProcessing(true);
+        setError(null);
         try {
             let finalBeforeHtml = beforeInput;
             let finalAfterHtml = afterInput;
 
-            if (beforeMode === 'url') finalBeforeHtml = await fetchHtml(beforeInput);
-            if (afterMode === 'url') finalAfterHtml = await fetchHtml(afterInput);
+            if (beforeMode === 'url') {
+                const res = await new Promise<{ html?: string; error?: string }>((resolve) => {
+                    // @ts-ignore
+                    chrome.runtime.sendMessage({ action: 'fetch_html', url: beforeInput }, resolve);
+                });
+                if (res.error) throw new Error(res.error);
+                finalBeforeHtml = res.html!;
+            }
+            if (afterMode === 'url') {
+                const res = await new Promise<{ html?: string; error?: string }>((resolve) => {
+                    // @ts-ignore
+                    chrome.runtime.sendMessage({ action: 'fetch_html', url: afterInput }, resolve);
+                });
+                if (res.error) throw new Error(res.error);
+                finalAfterHtml = res.html!;
+            }
 
             const beforeTree = parseHtmlToTree(finalBeforeHtml);
             const afterTree = parseHtmlToTree(finalAfterHtml);
 
-            let { before: diffedBefore, after: diffedAfter } = diffTrees(beforeTree, afterTree);
+            const { before: diffedBefore, after: diffedAfter } = diffTrees(beforeTree, afterTree);
 
-            if (showOnlyChanges) {
-                diffedBefore = filterTree(diffedBefore);
-                diffedAfter = filterTree(diffedAfter);
-            }
-
-            const { nodes: bNodes, edges: bEdges } = treeToFlow(diffedBefore, 0, 0);
-            let maxX = 0;
-            bNodes.forEach(n => { if (n.position.x > maxX) maxX = n.position.x; });
-            const rightXOffset = Math.max(maxX + 600, 800);
-
-            const { nodes: aNodes, edges: aEdges } = treeToFlow(diffedAfter, rightXOffset, 0);
-
-            setNodes([...bNodes, ...aNodes]);
-            setEdges([...bEdges, ...aEdges]);
+            setRawDiffedBefore(diffedBefore);
+            setRawDiffedAfter(diffedAfter);
             setHasCompared(true);
             setSelectedNode(null);
         } catch (e: any) {
-            console.error(e);
-            alert("Failed to parse HTML or compare trees: " + (e.message || "Unknown error"));
+            setError(e.message || 'Failed to parse HTML or compare trees');
         } finally {
             setIsProcessing(false);
         }
-    }, [beforeInput, afterInput, beforeMode, afterMode, setNodes, setEdges, showOnlyChanges, filterTree]);
+    }, [beforeInput, afterInput, beforeMode, afterMode]);
 
     const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
-        setSelectedNode(node.data.node as DomTreeNode);
-    }, []);
+        const clickedNode = node.data.node as DomTreeNode;
+        const beforeMap = buildPathMap(rawDiffedBefore);
+        const afterMap = buildPathMap(rawDiffedAfter);
+        setSelectedNode({
+            before: beforeMap.get(clickedNode.path) ?? null,
+            after: afterMap.get(clickedNode.path) ?? null,
+        });
+    }, [rawDiffedBefore, rawDiffedAfter, buildPathMap]);
 
     return (
         <div className="flex flex-col gap-6 w-full grow min-h-[600px] h-[70vh]">
@@ -157,6 +187,13 @@ export default function DomDiffTab() {
                         </div>
                     </div>
 
+                    {error && (
+                        <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+                            <AlertCircle size={18} className="shrink-0" />
+                            {error}
+                        </div>
+                    )}
+
                     <div className="flex flex-col items-center mt-4 mb-20 gap-4">
                         <label className="flex items-center gap-3 cursor-pointer group">
                             <div className="relative">
@@ -196,8 +233,24 @@ export default function DomDiffTab() {
 
                         <div className="w-px h-6 bg-zinc-800 mx-2"></div>
 
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <div className="relative">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={showOnlyChanges}
+                                    onChange={(e) => setShowOnlyChanges(e.target.checked)}
+                                />
+                                <div className="w-8 h-4 bg-zinc-700 rounded-full peer-checked:bg-accent transition-colors" />
+                                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-zinc-400 rounded-full peer-checked:translate-x-4 peer-checked:bg-white transition-all" />
+                            </div>
+                            <span className="text-zinc-400 text-xs font-medium">Changes only</span>
+                        </label>
+
+                        <div className="w-px h-6 bg-zinc-800 mx-2"></div>
+
                         <button
-                            onClick={() => setHasCompared(false)}
+                            onClick={() => { setHasCompared(false); setError(null); }}
                             className="bg-accent/10 hover:bg-accent text-accent hover:text-white px-4 py-2 rounded-xl transition-all"
                         >
                             Edit Inputs
@@ -231,7 +284,11 @@ export default function DomDiffTab() {
                     </ReactFlow>
 
                     {selectedNode && (
-                        <NodeSidebar node={selectedNode} onClose={() => setSelectedNode(null)} />
+                        <NodeSidebar
+                            before={selectedNode.before}
+                            after={selectedNode.after}
+                            onClose={() => setSelectedNode(null)}
+                        />
                     )}
                 </div>
             )}
