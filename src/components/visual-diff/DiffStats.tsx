@@ -26,7 +26,10 @@ export default function DiffStats({ result }: DiffStatsProps) {
                     {result.diffPercentage.toFixed(2)}% Difference
                 </p>
                 <p className="text-sm opacity-80">
-                    {result.diffPixels.toLocaleString()} out of {result.totalPixels.toLocaleString()} pixels changed.
+                    {result.diffPixels.toLocaleString()} / {result.totalPixels.toLocaleString()} pixels
+                    {result.boundingBoxes.length > 0 && (
+                        <span className="ml-2 opacity-70">· {result.boundingBoxes.length} region{result.boundingBoxes.length !== 1 ? 's' : ''}</span>
+                    )}
                 </p>
             </div>
         </div>

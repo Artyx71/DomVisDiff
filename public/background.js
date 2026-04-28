@@ -15,6 +15,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
             sendResponse({ dataUrl });
         });
-        return true; // Keep channel open for async response
+        return true;
+    }
+
+    if (message.action === 'fetch_html') {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
+        fetch(message.url, { signal: controller.signal })
+            .then(res => {
+                clearTimeout(timeout);
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                return res.text();
+            })
+            .then(html => sendResponse({ html }))
+            .catch(err => sendResponse({ error: err.message || 'Fetch failed' }));
+
+        return true;
     }
 });
